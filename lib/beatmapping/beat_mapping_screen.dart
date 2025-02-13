@@ -126,6 +126,17 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
       String message = response['message'] ?? '❌\n Could not mark done!\n' + response['error'] + '\nDistance: ' + (response['distanceFromDealer'] ?? "No distance available.");
       String distance = response.containsKey('distanceFromDealer') ? response['distanceFromDealer'].toString() : "N/A";
 
+      if (!isError) {
+        // ✅ Update dealer status in `_weeklySchedule`
+        setState(() {
+          for (var dealer in _weeklySchedule[_selectedDay] ?? []) {
+            if (dealer["_id"] == dealerId) {
+              dealer["status"] = "done"; // Update status in the UI
+            }
+          }
+        });
+      }
+
       _showResponsePopup(parentContext, message, distance, isError);
     } catch (e) {
       log("❌ Unexpected error in dealer status update: $e");
