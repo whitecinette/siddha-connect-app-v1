@@ -1,0 +1,87 @@
+# Flutter build and output directories
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+.idea/
+android/.gradle/
+android/app/key.jks
+
+# iOS
+ios/.generated/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/App.framework
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
+ios/Runner.xcworkspace/
+ios/Podfile.lock
+
+# macOS
+macos/Flutter/ephemeral/
+macos/.symlinks/
+macos/.dart_tool/
+macos/Pods/
+macos/Podfile.lock
+
+# Windows
+windows/.dart_tool/
+windows/flutter/ephemeral/
+
+# Linux
+linux/.dart_tool/
+linux/flutter/ephemeral/
+
+# Web
+web/.dart_tool/
+web/flutter/ephemeral/
+
+# Firebase & Google Services
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Logs & Temporary Files
+*.log
+*.lock
+*.tmp
+*.swp
+*.swo
+*.swn
+*.DS_Store
+
+# JetBrains IDEs
+.idea/
+
+# VS Code
+.vscode/
+
+# Flutter environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# Dart Analysis & Debugging
+analysis_options.yaml
+debug.log
+coverage/
+
+# Generated localization files
+lib/l10n/*.dart
+
+# Ignore test coverage reports
+coverage/
+
+# Ignore generated files from Flutter dependencies
+generated_plugin_registrant.dart
+
+# Ignore personal IntelliJ/Android Studio settings
+*.iml
+*.ipr
+*.iws
