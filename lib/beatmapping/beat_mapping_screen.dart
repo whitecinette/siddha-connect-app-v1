@@ -24,6 +24,8 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
   bool _isLoading = false;
   bool _isUpdating = false;
 
+  Map<String, bool> _isUpdatingMap = {}; // Track button states
+
   @override
   void initState() {
     super.initState();
@@ -56,11 +58,57 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
   }
 
 
+  // Future<void> _updateDealerStatusWithProximity(BuildContext parentContext, String scheduleId, String dealerId) async {
+  //   if (!parentContext.mounted) return;
+  //
+  //   print("Reaching _Update....");
+  //   print("Schedule id, dealer id: ${scheduleId}, ${dealerId}");
+  //
+  //   _showLoadingPopup(parentContext); // Show loading popup
+  //
+  //   try {
+  //     final response = await ref.read(beatMappingRepoProvider).updateDealerStatusWithProximity(scheduleId, dealerId);
+  //     log("📌 Dealer status response after fix: $response");
+  //
+  //     if (response == null) {
+  //       log("🚨 API returned null response. This should not happen anymore.");
+  //       _showResponsePopup(parentContext, "API returned no response. Please try again.", "N/A", true);
+  //       return;
+  //     }
+  //
+  //     bool isError = response.containsKey('error');
+  //     String message = response['message'] ?? '❌\n Could not mark done!\n' + response['error'] + '\nDistance: ' + (response['distanceFromDealer'] ?? "No distance available.");
+  //     String distance = response.containsKey('distanceFromDealer') ? response['distanceFromDealer'].toString() : "N/A";
+  //
+  //
+  //     _showResponsePopup(parentContext, message, distance, isError);
+  //   } catch (e) {
+  //     log("❌ Unexpected error in dealer status update: $e");
+  //     _showResponsePopup(parentContext, "Something went wrong. Please try again.", "N/A", true);
+  //   } finally {
+  //     try {
+  //       if (parentContext.mounted) {
+  //         Future.delayed(Duration(seconds: 10), () {
+  //           if (parentContext.mounted) {
+  //             Navigator.of(parentContext, rootNavigator: true).pop();
+  //           }
+  //         });
+  //       }
+  //     } catch (e) {
+  //       log("⚠️ Popup already closed: $e");
+  //     }
+  //   }
+  // }
+
   Future<void> _updateDealerStatusWithProximity(BuildContext parentContext, String scheduleId, String dealerId) async {
     if (!parentContext.mounted) return;
 
     print("Reaching _Update....");
     print("Schedule id, dealer id: ${scheduleId}, ${dealerId}");
+
+    setState(() {
+      _isUpdatingMap[dealerId] = true; // Mark only this button as updating
+    });
 
     _showLoadingPopup(parentContext); // Show loading popup
 
@@ -78,12 +126,15 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
       String message = response['message'] ?? '❌\n Could not mark done!\n' + response['error'] + '\nDistance: ' + (response['distanceFromDealer'] ?? "No distance available.");
       String distance = response.containsKey('distanceFromDealer') ? response['distanceFromDealer'].toString() : "N/A";
 
-
       _showResponsePopup(parentContext, message, distance, isError);
     } catch (e) {
       log("❌ Unexpected error in dealer status update: $e");
       _showResponsePopup(parentContext, "Something went wrong. Please try again.", "N/A", true);
     } finally {
+      setState(() {
+        _isUpdatingMap[dealerId] = false; // Reset only this button
+      });
+
       try {
         if (parentContext.mounted) {
           Future.delayed(Duration(seconds: 10), () {
@@ -278,37 +329,46 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                             children: [
                               Expanded(child: Text(shop?["dealerCode"] ?? "N/A")),
                               Expanded(child: Text(shop?["dealerName"] ?? "Unknown")),
+                              // Expanded(
+                              //   child: ElevatedButton(
+                              //     onPressed: _isUpdatingMap ? null : () async {  // Disable button when loading
+                              //       setState(() => _isUpdatingMap = true); // Start loader
+                              //
+                              //       final locationService = BeatMappingLocationService(ref);
+                              //       try {
+                              //         await locationService.getLocation();
+                              //         final coordinates = ref.read(beatMappingCoordinatesProvider);
+                              //
+                              //         await _updateDealerStatusWithProximity(
+                              //             context,
+                              //             _scheduleId ?? "",
+                              //             shop?["_id"] ?? ""
+                              //         );
+                              //       } catch (e) {
+                              //         _showResponsePopup(context, "Failed to get location: $e", "N/A", true);
+                              //       } finally {
+                              //         setState(() => _isUpdating = false); // Stop loader
+                              //       }
+                              //     },
+                              //     child: _isUpdating
+                              //         ? SizedBox(
+                              //       width: 20,
+                              //       height: 20,
+                              //       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              //     )
+                              //         : Text("Mark"),
+                              //   ),
+                              // ),
                               Expanded(
-                                child: ElevatedButton(
-                                  onPressed: _isUpdating ? null : () async {  // Disable button when loading
-                                    setState(() => _isUpdating = true); // Start loader
-
-                                    final locationService = BeatMappingLocationService(ref);
-                                    try {
-                                      await locationService.getLocation();
-                                      final coordinates = ref.read(beatMappingCoordinatesProvider);
-
-                                      await _updateDealerStatusWithProximity(
-                                          context,
-                                          _scheduleId ?? "",
-                                          shop?["_id"] ?? ""
-                                      );
-                                    } catch (e) {
-                                      _showResponsePopup(context, "Failed to get location: $e", "N/A", true);
-                                    } finally {
-                                      setState(() => _isUpdating = false); // Stop loader
-                                    }
-                                  },
-                                  child: _isUpdating
-                                      ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                  )
-                                      : Text("Mark"),
-                                ),
+                              child: ElevatedButton(
+                              onPressed: (shop?["status"] == "done" || (_isUpdatingMap[shop?["_id"]] ?? false))
+                              ? null
+                                  : () => _updateDealerStatusWithProximity(context, _scheduleId, shop?["_id"] ?? ""),
+                              child: (_isUpdatingMap[shop?["_id"]] ?? false)
+                              ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  : Text("Mark"),
                               ),
-
+                              ),
 
 
                             ],
