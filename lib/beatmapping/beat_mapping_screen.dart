@@ -29,6 +29,14 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Get the current weekday index (1 = Monday, 7 = Sunday)
+    int currentDayIndex = DateTime.now().weekday;
+
+    // Map the weekday index to the corresponding day string
+    _selectedDay = _weekDays[currentDayIndex - 1]; // _weekDays starts from "Mon"
+
+    // Fetch the data for the selected day
     _fetchBeatMappingData();
   }
 
@@ -265,37 +273,50 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
   @override
   Widget build(BuildContext context) {
     String currentDate = DateFormat('EEEE, dd MMMM yyyy').format(DateTime.now());
+    int currentDayIndex = DateTime.now().weekday; // Get current weekday index
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Beat Mapping"),
+        title: Text("Beat Mapping", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        backgroundColor: Color(0xFF003F91),
         actions: [
           TextButton(
             onPressed: _fetchBeatMappingData,
-            child: Text("Refresh Data", style: TextStyle(color: Colors.white)),
+            child: Text("Refresh Data", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
       body: Row(
         children: [
           Container(
-            width: 80,
-            color: Colors.grey.shade200,
+            width: 90,
+            decoration: BoxDecoration(
+              color:  Color(0xFF5DA9E9),
+              boxShadow: [BoxShadow(color: Colors.grey.shade400, blurRadius: 5)],
+            ),
             child: ListView.builder(
               itemCount: _weekDays.length,
               itemBuilder: (context, index) {
                 String day = _weekDays[index];
+                String dayInitial = day.substring(0, 1).toUpperCase();
                 return GestureDetector(
                   onTap: () => setState(() => _selectedDay = day),
-                  child: Container(
-                    padding: EdgeInsets.all(12),
-                    color: _selectedDay == day ? Colors.blue : Colors.transparent,
-                    child: Text(
-                      day,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: _selectedDay == day ? Colors.white : Colors.black,
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    margin: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: _selectedDay == day ? Colors.white : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        dayInitial,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: _selectedDay == day ? Colors.black : Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -305,83 +326,77 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: Text(
                       "Today's Date: $currentDate",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
-                  if (_isLoading) Center(child: CircularProgressIndicator()),
+                  if (_isLoading) Center(child: CircularProgressIndicator(color: Colors.teal)),
                   Expanded(
                     child: _weeklySchedule[_selectedDay]?.isEmpty ?? true
                         ? Center(
-                      child: Text("No Shops Found", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
+                      child: Text(
+                        "No Shops Found",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey.shade600),
+                      ),
                     )
                         : ListView.builder(
                       itemCount: _weeklySchedule[_selectedDay]?.length ?? 0,
                       itemBuilder: (context, index) {
                         var shop = _weeklySchedule[_selectedDay]?[index];
-                        // print("Shop: ${shop}");
+
+                        bool isToday = DateTime.now().weekday == currentDayIndex;
+                        bool isDisabled = !isToday; // Disable marking for non-current days
+
                         return Container(
-                          padding: EdgeInsets.all(12),
-                          margin: EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                          padding: EdgeInsets.all(16),
+                          margin: EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 3)],
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(color: Colors.grey.shade400, blurRadius: 6, offset: Offset(2, 2)),
+                            ],
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Expanded(child: Text(shop?["dealerCode"] ?? "N/A")),
-                              Expanded(child: Text(shop?["dealerName"] ?? "Unknown")),
-                              // Expanded(
-                              //   child: ElevatedButton(
-                              //     onPressed: _isUpdatingMap ? null : () async {  // Disable button when loading
-                              //       setState(() => _isUpdatingMap = true); // Start loader
-                              //
-                              //       final locationService = BeatMappingLocationService(ref);
-                              //       try {
-                              //         await locationService.getLocation();
-                              //         final coordinates = ref.read(beatMappingCoordinatesProvider);
-                              //
-                              //         await _updateDealerStatusWithProximity(
-                              //             context,
-                              //             _scheduleId ?? "",
-                              //             shop?["_id"] ?? ""
-                              //         );
-                              //       } catch (e) {
-                              //         _showResponsePopup(context, "Failed to get location: $e", "N/A", true);
-                              //       } finally {
-                              //         setState(() => _isUpdating = false); // Stop loader
-                              //       }
-                              //     },
-                              //     child: _isUpdating
-                              //         ? SizedBox(
-                              //       width: 20,
-                              //       height: 20,
-                              //       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                              //     )
-                              //         : Text("Mark"),
-                              //   ),
-                              // ),
                               Expanded(
-                              child: ElevatedButton(
-                              onPressed: (shop?["status"] == "done" || (_isUpdatingMap[shop?["_id"]] ?? false))
-                              ? null
-                                  : () => _updateDealerStatusWithProximity(context, _scheduleId, shop?["_id"] ?? ""),
-                              child: (_isUpdatingMap[shop?["_id"]] ?? false)
-                              ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                  : Text("Mark"),
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 16),
+                                  child: Text(
+                                    shop?["dealerCode"] ?? "N/A",
+                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.teal.shade900),
+                                  ),
+                                ),
                               ),
+                              Expanded(
+                                child: Text(
+                                  shop?["dealerName"] ?? "Unknown",
+                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+                                ),
                               ),
-
-
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: (shop?["status"] == "done" || (_isUpdatingMap[shop?["_id"]] ?? false) || isDisabled)
+                                      ? null
+                                      : () => _updateDealerStatusWithProximity(context, _scheduleId, shop?["_id"] ?? ""),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color(0xFFF17300),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  child: (_isUpdatingMap[shop?["_id"]] ?? false)
+                                      ? SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 0.5,))
+                                      :  Text(shop?["status"] == "done" ? "Done" : "Mark"),
+                                ),
+                              ),
                             ],
                           ),
                         );
@@ -396,4 +411,5 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
       ),
     );
   }
+
 }
