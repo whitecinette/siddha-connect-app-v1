@@ -277,7 +277,7 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Beat Mapping", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        title: Text("Beat Mapping", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Color(0xFFF5F5F5))),
         backgroundColor: Color(0xFF003F91),
         actions: [
           TextButton(
@@ -291,7 +291,7 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
           Container(
             width: 90,
             decoration: BoxDecoration(
-              color:  Color(0xFF5DA9E9),
+              color:  Color(0xFF005BB5),
               boxShadow: [BoxShadow(color: Colors.grey.shade400, blurRadius: 5)],
             ),
             child: ListView.builder(
@@ -306,7 +306,7 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                     margin: EdgeInsets.symmetric(vertical: 6, horizontal: 4),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: _selectedDay == day ? Colors.white : Colors.transparent,
+                        color: _selectedDay == day ? Color(0xFFD8EAFB) : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -358,7 +358,7 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                           padding: EdgeInsets.all(16),
                           margin: EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Color(0xFFF8F9FA),
                             borderRadius: BorderRadius.circular(15),
                             boxShadow: [
                               BoxShadow(color: Colors.grey.shade400, blurRadius: 6, offset: Offset(2, 2)),
@@ -372,14 +372,14 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                                   padding: EdgeInsets.only(right: 16),
                                   child: Text(
                                     shop?["dealerCode"] ?? "N/A",
-                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.teal.shade900),
+                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF003F91)),
                                   ),
                                 ),
                               ),
                               Expanded(
                                 child: Text(
                                   shop?["dealerName"] ?? "Unknown",
-                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: Color(0xFF333333)),
                                 ),
                               ),
                               Expanded(
@@ -388,13 +388,13 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                                       ? null
                                       : () => _updateDealerStatusWithProximity(context, _scheduleId, shop?["_id"] ?? ""),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFF17300),
+                                    backgroundColor: shop?["status"] == "done" ? Color(0xFF28C76F) : Color(0xFFFF6B3B),
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
                                   child: (_isUpdatingMap[shop?["_id"]] ?? false)
                                       ? SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 0.5,))
-                                      :  Text(shop?["status"] == "done" ? "Done" : "Mark"),
+                                      :  Text(shop?["status"] == "done" ? "Done" : "Mark", style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),),
                                 ),
                               ),
                             ],
