@@ -216,7 +216,7 @@ class _CusDrawerState extends ConsumerState<CusDrawer> {
                       ),
 
                 DrawerElement(
-                  src: "assets/images/finance.svg", // Change the icon as per your assets
+                  src: "assets/images/beatMapping.svg", // Change the icon as per your assets
                   title: "Beat Mapping",
                   onTap: () {
                     // Navigate to the appropriate screen

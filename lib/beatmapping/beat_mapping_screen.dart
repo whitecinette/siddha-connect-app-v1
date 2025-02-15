@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:siddha_connect/beatmapping/fetched_location.dart';
 import 'package:siddha_connect/beatmapping/repo/beat_mapping_repo.dart';
 import 'package:dio/dio.dart';
+import 'package:siddha_connect/utils/common_style.dart';
 
 Dio dio = Dio();
 
@@ -278,20 +279,20 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Beat Mapping", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Color(0xFFF5F5F5))),
-        backgroundColor: Color(0xFF003F91),
+        backgroundColor: AppColor.primaryColor, //header color
         actions: [
-          TextButton(
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
             onPressed: _fetchBeatMappingData,
-            child: Text("Refresh Data", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
       body: Row(
         children: [
           Container(
-            width: 90,
+            width: 80,
             decoration: BoxDecoration(
-              color:  Color(0xFF005BB5),
+              color: AppColor.primaryColor, //sidebar color
               boxShadow: [BoxShadow(color: Colors.grey.shade400, blurRadius: 5)],
             ),
             child: ListView.builder(
@@ -365,24 +366,30 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                             ],
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.only(right: 16),
-                                  child: Text(
-                                    shop?["dealerCode"] ?? "N/A",
-                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Color(0xFF003F91)),
+                                  padding: EdgeInsets.only(right: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        shop?["dealerCode"] ?? "N/A",
+                                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF003F91)),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        shop?["dealerName"] ?? "Unknown",
+                                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16, color: Color(0xFF333333)),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                child: Text(
-                                  shop?["dealerName"] ?? "Unknown",
-                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: Color(0xFF333333)),
-                                ),
-                              ),
-                              Expanded(
+                              SizedBox(width: 6), // Added slight gap between dealer name and button
+                              SizedBox(
+                                width: 65,
+                                height: 24,
                                 child: ElevatedButton(
                                   onPressed: (shop?["status"] == "done" || (_isUpdatingMap[shop?["_id"]] ?? false) || isDisabled)
                                       ? null
@@ -391,14 +398,19 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                                     backgroundColor: shop?["status"] == "done" ? Color(0xFF28C76F) : Color(0xFFFF6B3B),
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    padding: EdgeInsets.zero,
                                   ),
                                   child: (_isUpdatingMap[shop?["_id"]] ?? false)
-                                      ? SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 0.5,))
-                                      :  Text(shop?["status"] == "done" ? "Done" : "Mark", style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),),
+                                      ? SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 1))
+                                      : Text(
+                                    shop?["status"] == "done" ? "Done" : "Mark",
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                             ],
-                          ),
+                          )
+
                         );
                       },
                     ),
