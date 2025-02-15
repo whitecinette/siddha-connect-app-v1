@@ -401,7 +401,7 @@ class _BeatMappingScreenState extends ConsumerState<BeatMappingScreen> {
                                     padding: EdgeInsets.zero,
                                   ),
                                   child: (_isUpdatingMap[shop?["_id"]] ?? false)
-                                      ? SizedBox(width: 8, height: 8, child: CircularProgressIndicator(strokeWidth: 1))
+                                      ? SizedBox(width: 10, height: 10, child: CircularProgressIndicator(strokeWidth: 1))
                                       : Text(
                                     shop?["status"] == "done" ? "Done" : "Mark",
                                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
