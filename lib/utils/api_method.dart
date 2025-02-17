@@ -188,6 +188,8 @@ class ApiUrl {
   // static String storeLocation = "$baseUrl/weekly-schedule/:scheduleId/dealer/:dealerId/status-proximity";
   static String storeLocation = "$baseUrl/weekly-schedule";
 
+  static String adminGetWeeklyBeatMapping = "$baseUrl/admin/get-weekly-beat-mapping";
+
 }
 
 

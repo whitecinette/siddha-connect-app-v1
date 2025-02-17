@@ -15,6 +15,7 @@ import 'package:siddha_connect/uploadSalesData/screens/upload_segment_target.dar
 import 'package:siddha_connect/uploadSalesData/screens/upload_model_data.dart';
 import 'package:siddha_connect/utils/navigation.dart';
 import 'package:siddha_connect/utils/providers.dart';
+import 'package:siddha_connect/beatmapping/beat_mapping_status.dart';
 import '../auth/repo/auth_repo.dart';
 import '../salesDashboard/screen/sales_dashboard.dart';
 import 'common_style.dart';
@@ -214,6 +215,7 @@ class _CusDrawerState extends ConsumerState<CusDrawer> {
                               }),
                         ],
                       ),
+// //==================================! Beat  Mapping !=========================
 
                 DrawerElement(
                   src: "assets/images/beatMapping.svg", // Change the icon as per your assets
@@ -222,6 +224,32 @@ class _CusDrawerState extends ConsumerState<CusDrawer> {
                     // Navigate to the appropriate screen
                     navigationPush(context,  BeatMappingScreen());
                   },
+                ),
+
+                DrawerElement(
+                  src: "assets/images/beatMapping.svg", // Change the icon as per your assets
+                  title: "Beat Mapping Status",
+                  onTap: () {
+                    navigationPush(context, BeatMappingStatusScreen());
+                  },
+                ),
+
+                // ✅ Show "Beat Mapping Status" ONLY for Admins ✅
+                userData.when(
+                  data: (data) {
+                    bool isAdmin = data?["is_siddha_admin"] ?? false;
+                    return isAdmin
+                        ? DrawerElement(
+                      src: "assets/images/status.svg", // Change the icon as per your assets
+                      title: "Beat Mapping Status",
+                      onTap: () {
+                        navigationPush(context, BeatMappingStatusScreen());
+                      },
+                    )
+                        : SizedBox.shrink();
+                  },
+                  loading: () => SizedBox.shrink(),
+                  error: (error, stackTrace) => SizedBox.shrink(),
                 ),
 
 
